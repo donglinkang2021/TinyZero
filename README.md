@@ -15,19 +15,19 @@ Paper's on it's way!
 
 ## Installation
 
-```
+```bash
 conda create -n zero python=3.9
 # install torch [or you can skip this step and let vllm to install the correct version for you]
 pip install torch==2.4.0 --index-url https://download.pytorch.org/whl/cu121
 # install vllm
-pip3 install vllm==0.6.3 # or you can install 0.5.4, 0.4.2 and 0.3.1
-pip3 install ray
+pip install vllm==0.6.3 # or you can install 0.5.4, 0.4.2 and 0.3.1
+pip install ray
 
 # verl
 pip install -e .
 
 # flash attention 2
-pip3 install flash-attn --no-build-isolation
+pip install flash-attn --no-build-isolation
 # quality of life
 pip install wandb IPython matplotlib
 ```
@@ -35,7 +35,8 @@ pip install wandb IPython matplotlib
 ## Countdown task
 
 **Data Preparation**
-```
+
+```bash
 conda activate zero
 python ./examples/data_preprocess/countdown.py --local_dir {path_to_your_dataset}
 ```
