@@ -37,7 +37,8 @@ pip install wandb IPython matplotlib
 Before you run any script here, please set this two enviroment variable here:
 
 ```bash
-export HF_HOME=/data1/linkdom/.cache/huggingface
+# export HF_HOME=/data1/linkdom/.cache/huggingface
+export HF_HOME=/root/autodl-tmp/.cache/huggingface # autodl
 export HF_ENDPOINT=https://hf-mirror.com
 # echo $HF_HOME
 # du -h --max-depth=1 $HF_HOME/hub
@@ -52,7 +53,8 @@ du -h --max-depth=1 $HF_HOME/hub | grep Qwen
 ```bash
 conda activate zero
 # python ./examples/data_preprocess/countdown.py --local_dir {path_to_your_dataset}
-python ./examples/data_preprocess/countdown.py --local_dir /data1/linkdom/zero_data
+# python ./examples/data_preprocess/countdown.py --local_dir /data1/linkdom/zero_data
+python ./examples/data_preprocess/countdown.py --local_dir /root/autodl-tmp/zero/data/countdown
 ```
 
 ## Download Pretrained Model
@@ -63,6 +65,8 @@ See [here](./demo/download_model.py).
 
 ```bash
 conda activate zero
+wandb login
+<view https://wandb.ai/authorize to get your_wandb_key>
 ```
 
 For the following code, if you see Out-of-vram, try add `critic.model.enable_gradient_checkpointing=True` to the script, and checkout the discussion [here](https://github.com/Jiayi-Pan/TinyZero/issues/5#issuecomment-2624161643)
@@ -72,10 +76,10 @@ For the following code, if you see Out-of-vram, try add `critic.model.enable_gra
 Works for model <= 1.5B. For Qwen2.5-0.5B base, we know it fails to learn reasoning.
 
 ```bash
-export N_GPUS=2
+export N_GPUS=1
 export BASE_MODEL=Qwen/Qwen2.5-0.5B
-export DATA_DIR=/data1/linkdom/zero_data
-export ROLLOUT_TP_SIZE=2
+export DATA_DIR=/root/autodl-tmp/zero/data/countdown
+export ROLLOUT_TP_SIZE=1
 export EXPERIMENT_NAME=countdown-qwen2.5-0.5b
 export VLLM_ATTENTION_BACKEND=XFORMERS
 
@@ -84,6 +88,18 @@ bash ./scripts/train_tiny_zero.sh
 
 > [!NOTE] Comment
 > - 20250324_1707: Qwen2.5-0.5B has 14 heads should not set rollout_tp_size to 4, 就是说14不能被4整除，只能是2，而且实测发现45GB的空间依然不够，目前思考的方向是去找更大的机器跑一下
+> - 20250324_1858: 实测成功了，在autodl A800x1 80G上跑的，修改了batch_size为64才终于能跑，最高能到50G占用，起码是跑通了，但是发现模型一直学不到东西，按照之前的思路，拿math 1.5B的模型来跑，看看能不能学到东西
+
+```bash
+export N_GPUS=1
+export BASE_MODEL=Qwen/Qwen2.5-Math-1.5B
+export DATA_DIR=/root/autodl-tmp/zero/data/countdown
+export ROLLOUT_TP_SIZE=1
+export EXPERIMENT_NAME=countdown-qwen2.5-math-1.5b
+export VLLM_ATTENTION_BACKEND=XFORMERS
+
+bash ./scripts/train_tiny_zero.sh
+```
 
 **3B+ model**
 

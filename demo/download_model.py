@@ -68,10 +68,10 @@ if __name__ == '__main__':
 
     # `-Instruct` for chat, we need without-`-Instruct` one for fine-tuning
     # model_name = 'Qwen/Qwen2.5-Math-1.5B' 
-    model_name = 'Qwen/Qwen2.5-Math-1.5B-Instruct' 
+    # model_name = 'Qwen/Qwen2.5-Math-1.5B-Instruct' 
     # model_name = 'Qwen/Qwen2.5-0.5B'
     # model_name = 'Qwen/Qwen2.5-0.5B-Instruct'
-    # model_name = 'Qwen/Qwen2.5-1.5B'
+    model_name = 'Qwen/Qwen2.5-1.5B'
     # model_name = 'Qwen/Qwen2.5-1.5B-Instruct'
 
 
@@ -80,5 +80,5 @@ if __name__ == '__main__':
     prompt = "How many 'r's in the word 'strawberry'? Let's think step by step."
 
 
-    # test_hf(model_name, prompt)
-    test_vllm(model_name, prompt) # vllm serve Qwen/Qwen2.5-Math-1.5B-Instruct
+    test_hf(model_name, prompt)
+    # test_vllm(model_name, prompt) # vllm serve Qwen/Qwen2.5-Math-1.5B-Instruct
