@@ -37,8 +37,8 @@ pip install wandb IPython matplotlib
 Before you run any script here, please set this two enviroment variable here:
 
 ```bash
-# export HF_HOME=/data1/linkdom/.cache/huggingface
-export HF_HOME=/root/autodl-tmp/.cache/huggingface # autodl
+# export HF_HOME=/root/autodl-tmp/.cache/huggingface # autodl
+export HF_HOME=/data1/linkdom/.cache/huggingface
 export HF_ENDPOINT=https://hf-mirror.com
 # echo $HF_HOME
 # du -h --max-depth=1 $HF_HOME/hub
@@ -53,8 +53,8 @@ du -h --max-depth=1 $HF_HOME/hub | grep Qwen
 ```bash
 conda activate zero
 # python ./examples/data_preprocess/countdown.py --local_dir {path_to_your_dataset}
-# python ./examples/data_preprocess/countdown.py --local_dir /data1/linkdom/zero_data
-python ./examples/data_preprocess/countdown.py --local_dir /root/autodl-tmp/zero/data/countdown
+python ./examples/data_preprocess/countdown.py --local_dir /data1/linkdom/zero/data/countdown
+# python ./examples/data_preprocess/countdown.py --local_dir /root/autodl-tmp/zero/data/countdown # autodl
 ```
 
 ## Download Pretrained Model
@@ -78,7 +78,7 @@ Works for model <= 1.5B. For Qwen2.5-0.5B base, we know it fails to learn reason
 ```bash
 export N_GPUS=1
 export BASE_MODEL=Qwen/Qwen2.5-0.5B
-export DATA_DIR=/root/autodl-tmp/zero/data/countdown
+export DATA_DIR=/data1/linkdom/zero/data/countdown
 export ROLLOUT_TP_SIZE=1
 export EXPERIMENT_NAME=countdown-qwen2.5-0.5b
 export VLLM_ATTENTION_BACKEND=XFORMERS
@@ -91,15 +91,29 @@ bash ./scripts/train_tiny_zero.sh
 > - 20250324_1858: 实测成功了，在autodl A800x1 80G上跑的，修改了batch_size为64才终于能跑，最高能到50G占用，起码是跑通了，但是发现模型一直学不到东西，按照之前的思路，拿math 1.5B的模型来跑，看看能不能学到东西
 
 ```bash
-export N_GPUS=1
+export N_GPUS=2
 export BASE_MODEL=Qwen/Qwen2.5-Math-1.5B
-export DATA_DIR=/root/autodl-tmp/zero/data/countdown
-export ROLLOUT_TP_SIZE=1
+export DATA_DIR=/data1/linkdom/zero/data/countdown
+export ROLLOUT_TP_SIZE=2
 export EXPERIMENT_NAME=countdown-qwen2.5-math-1.5b
 export VLLM_ATTENTION_BACKEND=XFORMERS
-
+export CUDA_VISIBLE_DEVICES=0,1
 bash ./scripts/train_tiny_zero.sh
 ```
+
+```bash
+export N_GPUS=2
+export BASE_MODEL=Qwen/Qwen2.5-0.5B
+export DATA_DIR=/data1/linkdom/zero/data/countdown
+export ROLLOUT_TP_SIZE=2
+export EXPERIMENT_NAME=countdown-qwen2.5-0.5b
+export VLLM_ATTENTION_BACKEND=XFORMERS
+export CUDA_VISIBLE_DEVICES=2,3
+bash ./scripts/train_tiny_zero.sh
+```
+
+> [!NOTE] Comment
+> - 20250324_2056: 基本跑通了第一轮看到reponse的长度在不断上升，获得的奖励也变得更好了，但还是没完整跑完一轮，现在是充分利用好4xA6000来跑下看结果，其中跑math的两个卡显存都拉到了40G，而跑0.5B的显存维持在每个卡15G以下，打算明天跑完看下结果：感觉这个框架还是有点复杂的。
 
 **3B+ model**
 
