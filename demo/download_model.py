@@ -71,8 +71,9 @@ if __name__ == '__main__':
     # model_name = 'Qwen/Qwen2.5-Math-1.5B-Instruct' 
     # model_name = 'Qwen/Qwen2.5-0.5B'
     # model_name = 'Qwen/Qwen2.5-0.5B-Instruct'
-    model_name = 'Qwen/Qwen2.5-1.5B'
+    # model_name = 'Qwen/Qwen2.5-1.5B'
     # model_name = 'Qwen/Qwen2.5-1.5B-Instruct'
+    model_name = 'Qwen/Qwen2.5-3B'
 
 
     # prompt = "Give me a short introduction to large language model."

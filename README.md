@@ -57,7 +57,7 @@ python ./examples/data_preprocess/countdown.py --local_dir /data1/linkdom/zero/d
 # python ./examples/data_preprocess/countdown.py --local_dir /root/autodl-tmp/zero/data/countdown # autodl
 ```
 
-## Download Pretrained Model
+### Download Pretrained Model
 
 See [here](./demo/download_model.py).
 
@@ -114,6 +114,7 @@ bash ./scripts/train_tiny_zero.sh
 
 > [!NOTE] Comment
 > - 20250324_2056: 基本跑通了第一轮看到reponse的长度在不断上升，获得的奖励也变得更好了，但还是没完整跑完一轮，现在是充分利用好4xA6000来跑下看结果，其中跑math的两个卡显存都拉到了40G，而跑0.5B的显存维持在每个卡15G以下，打算明天跑完看下结果：感觉这个框架还是有点复杂的。
+> - 20250325_0958: 跑了一晚上，0.5B的模型还是没学到东西，觉得不用再跑了；math-1.5B还是没有学会乘除和四位数的运算，只能做对三位数了，这里一直都是跑的ppo，决定去试一下grpo再看看，同时也先把3B的模型先下载了。
 
 **3B+ model**
 
@@ -121,14 +122,18 @@ In this case, the base model is able to develop sophisticated reasoning skills.
 
 ```bash
 export N_GPUS=2
-export BASE_MODEL={path_to_your_model}
-export DATA_DIR={path_to_your_dataset}
+export BASE_MODEL=Qwen/Qwen2.5-3B
+export DATA_DIR=/data1/linkdom/zero/data/countdown
 export ROLLOUT_TP_SIZE=2
 export EXPERIMENT_NAME=countdown-qwen2.5-3b
 export VLLM_ATTENTION_BACKEND=XFORMERS
 
 bash ./scripts/train_tiny_zero.sh
 ```
+
+> [!NOTE] Comment
+> - 20250325_1020: 之前就在 ./verl/trainer/config/ppo_trainer.yaml 修改过default_local_dir: /data1/linkdom/checkpoints, 这样做的目的是让checkpoint不保存在当前路径下，这个路径下的空间也不太够了，一晚上保存的checkpoint有268G多；此外之前一直都是batch_size为64的，现在用3B模型改为了32，看看能不能训起来；
+> - 20250325_1036: 发现3B基本训练不起来想着还是先这样算了，先去看看Logic-RL的实现怎么样；
 
 ### Instruct Ablation
 
