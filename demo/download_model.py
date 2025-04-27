@@ -1,4 +1,5 @@
-# Load model directly
+import torch
+import argparse
 from transformers import AutoTokenizer, AutoModelForCausalLM
 from transformers import TextStreamer
 from vllm import LLM, SamplingParams
@@ -39,7 +40,7 @@ def test_vllm(model_name, prompt):
     tokenizer = AutoTokenizer.from_pretrained(model_name)
 
     # Input the model name or path. Can be GPTQ or AWQ models.
-    llm = LLM(model=model_name)
+    llm = LLM(model=model_name, tensor_parallel_size=torch.cuda.device_count())
 
     # Prepare your prompts
     messages = [
@@ -65,21 +66,31 @@ def test_vllm(model_name, prompt):
         print(f"Prompt: {prompt!r}, Generated text: {generated_text!r}")
 
 if __name__ == '__main__':
-
+    # Set up argument parser
+    parser = argparse.ArgumentParser(description="Run HF or vLLM model tests.")
     # `-Instruct` for chat, we need without-`-Instruct` one for fine-tuning
-    # model_name = 'Qwen/Qwen2.5-Math-1.5B' 
-    # model_name = 'Qwen/Qwen2.5-Math-1.5B-Instruct' 
-    # model_name = 'Qwen/Qwen2.5-0.5B'
-    # model_name = 'Qwen/Qwen2.5-0.5B-Instruct'
-    # model_name = 'Qwen/Qwen2.5-1.5B'
-    # model_name = 'Qwen/Qwen2.5-1.5B-Instruct'
-    model_name = 'Qwen/Qwen2.5-3B'
+    parser.add_argument("--model_name", type=str, default='Qwen/Qwen2.5-0.5B-Instruct', help="Name of the model to use.")
+    parser.add_argument("--prompt", type=str, default="How many 'r's in the word 'strawberry'? Let's think step by step.", help="Prompt to send to the model.")
+    parser.add_argument("--use_vllm", action='store_true', help="Use vLLM instead of Hugging Face Transformers.")
 
+    # Parse arguments
+    args = parser.parse_args()
 
+    # Use parsed arguments
+    model_name = args.model_name
+    prompt = args.prompt
+
+    # Example prompts
     # prompt = "Give me a short introduction to large language model."
     # prompt = "How many 'r's in the word 'strawberry'?"
-    prompt = "How many 'r's in the word 'strawberry'? Let's think step by step."
+    # prompt = "How many 'r's in the word 'strawberry'? Let's think step by step."
 
+    print(f"Using model: {model_name}")
+    print(f"Using prompt: {prompt}")
 
-    test_hf(model_name, prompt)
-    # test_vllm(model_name, prompt) # vllm serve Qwen/Qwen2.5-Math-1.5B-Instruct
+    if args.use_vllm:
+        print("Testing with vLLM...")
+        test_vllm(model_name, prompt) # vllm serve Qwen/Qwen2.5-Math-1.5B-Instruct
+    else:
+        print("Testing with Hugging Face Transformers...")
+        test_hf(model_name, prompt)
